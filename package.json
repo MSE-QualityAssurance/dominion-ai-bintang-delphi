@@ -1,0 +1,8 @@
+{
+  "name": "dominion-ai-bintang-delphi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/MSE-QualityAssurance/dominion-ai-bintang-delphi",
+  "author": "bintangadinandra <bintang.adinandra@pinhome.id>",
+  "license": "MIT"
+}
