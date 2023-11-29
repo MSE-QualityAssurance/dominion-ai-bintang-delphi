@@ -4,13 +4,18 @@ const readline = require('readline');
 const DominionGame = {
   players: [],
   cards: [],
-  initializeDecks() {
+initializeDecks() {
     // Initialize decks for each player with basic cards
     this.players.forEach(player => {
-      player.deck.push(new Card("Copper", 0, "Treasure")); // Example of adding Copper cards
-      // Add more initial cards to the player's deck
+        for (let i = 0; i < 7; i++) {
+            player.deck.push(new Card("Copper", 0, "Treasure"));
+        }
+        for (let i = 0; i < 3; i++) {
+            player.deck.push(new Card("Estate", 2, "Victory"));
+        }
+        // Add more initial cards to the player's deck
     });
-  },
+},
   nextPlayer() {
     // Logic to determine the next player's turn
   },
@@ -42,13 +47,37 @@ class Card {
 const game = Object.create(DominionGame);
 
 // Add players to the game
-game.players.push(new Player("Player 1"));
-game.players.push(new Player("Player 2"));
+function addPlayersToGame() {
+    const readline = require('readline');
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    rl.question('How many players do you want to add? ', (numPlayers) => {
+        for (let i = 1; i <= numPlayers; i++) {
+            rl.question(`Enter the name of Player ${i}: `, (name) => {
+                game.players.push(new Player(name));
+                if (i === numPlayers) {
+                    rl.close();
+                    // Call the next function here
+                    addCardsToGame();
+                }
+            });
+        }
+    });
+}
+
+addPlayersToGame();
 
 // Add cards to the game
-game.cards.push(new Card("Copper", 0, "Treasure"));
-game.cards.push(new Card("Silver", 3, "Treasure"));
-game.cards.push(new Card("Gold", 6, "Treasure"));
+function addCardsToGame() {
+    game.cards.push(new Card("Copper", 0, "Treasure"));
+    game.cards.push(new Card("Silver", 3, "Treasure"));
+    game.cards.push(new Card("Gold", 6, "Treasure"));
+}
+
+addCardsToGame();
 // Add more cards as needed
 
 // Initialize player decks
