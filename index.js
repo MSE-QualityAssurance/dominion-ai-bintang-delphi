@@ -31,6 +31,13 @@ class Player {
     this.discardPile = [];
     // Add more properties and methods as needed
   }
+
+  performAction(game) {
+    // Example: Automatically play the first action card in hand
+    if (this.hand.length > 0 && this.hand[0].type === "Action") {
+      this.hand[0].play(this, game);
+    }
+  }
 }
 
 // Define the Card object
@@ -42,6 +49,11 @@ class Card {
     // Add more properties and methods as needed
   }
 }
+
+const drawCardEffect = (player, game) => {
+  // Logic to draw a card from the player's deck
+  console.log(`${player.name} draws a card.`);
+};
 
 // Create a new Dominion game instance
 const game = Object.create(DominionGame);
@@ -97,9 +109,12 @@ function startGame() {
   function nextTurn() {
     const currentPlayer = game.players[currentPlayerIndex];
     console.log(`${currentPlayer.name}'s turn`);
-
-    // Add game turn logic here
-
+  
+    // Player performs action phase
+    currentPlayer.performAction(game);
+  
+    // Add additional phases (buy, cleanup, etc.)
+  
     currentPlayerIndex = (currentPlayerIndex + 1) % game.players.length;
     if (currentPlayerIndex === 0) {
       endGame();
