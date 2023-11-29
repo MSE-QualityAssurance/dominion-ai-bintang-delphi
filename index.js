@@ -1,59 +1,13 @@
 const readline = require('readline');
 
-// Define the Dominion game object
-const DominionGame = {
-  players: [],
-  cards: [],
-  initializeDecks() {
-    // Initialize decks for each player with basic cards
-    this.players.forEach(player => {
-      for (let i = 0; i < 7; i++) {
-        player.deck.push(new Card("Copper", 0, "Treasure"));
-      }
-      for (let i = 0; i < 3; i++) {
-        player.deck.push(new Card("Estate", 2, "Victory"));
-      }
-      // Add more initial cards to the player's deck
-    });
-  },
-  nextPlayer() {
-    // Logic to determine the next player's turn
-  },
-  // Add more properties and methods as needed
-};
+const { Player } = require('./classes/Player')
+const { DominionGame } = require('./classes/DominionGame')
+const { Card } = require('./classes/Card')
 
-// Define the Player object
-class Player {
-  constructor(name) {
-    this.name = name;
-    this.hand = [];
-    this.deck = [];
-    this.discardPile = [];
-    // Add more properties and methods as needed
-  }
-
-  performAction(game) {
-    // Example: Automatically play the first action card in hand
-    if (this.hand.length > 0 && this.hand[0].type === "Action") {
-      this.hand[0].play(this, game);
-    }
-  }
-}
-
-// Define the Card object
-class Card {
-  constructor(name, cost, type) {
-    this.name = name;
-    this.cost = cost;
-    this.type = type;
-    // Add more properties and methods as needed
-  }
-}
-
-const drawCardEffect = (player, game) => {
-  // Logic to draw a card from the player's deck
-  console.log(`${player.name} draws a card.`);
-};
+const { villageEffect } = require('./utils/effects')
+const { startPlayerTurn } = require('./utils/startPlayerTurn')
+const { performBuyPhase } = require('./utils/performBuyPhase')
+const { performCleanupPhase } = require('./utils/performCleanupPhase')
 
 // Create a new Dominion game instance
 const game = Object.create(DominionGame);
@@ -87,9 +41,11 @@ addPlayersToGame();
 
 // Add cards to the game
 function addCardsToGame() {
-  game.cards.push(new Card("Copper", 0, "Treasure"));
-  game.cards.push(new Card("Silver", 3, "Treasure"));
-  game.cards.push(new Card("Gold", 6, "Treasure"));
+  // game.cards.push(new Card("Village", 3, "Action", villageEffect));
+  game.cards.push(new Card("Copper", 0, "Treasure", null, 1)); // Copper value is 1
+  game.cards.push(new Card("Silver", 3, "Treasure", null, 2)); // Silver value is 2
+  game.cards.push(new Card("Gold", 6, "Treasure", null, 3)); // Gold value is 3
+
 }
 
 addCardsToGame();
@@ -114,19 +70,26 @@ function startGame() {
   // Simple game loop
   let currentPlayerIndex = 0;
 
-  function nextTurn() {
+  async function nextTurn() {
     const currentPlayer = game.players[currentPlayerIndex];
 
-    // Player performs action phase
-    currentPlayer.performAction(game);
+    // Start player's turn by drawing cards
+    startPlayerTurn(currentPlayer);
 
-    // Add additional phases (buy, cleanup, etc.)
+    // Action Phase
+    await currentPlayer.performAction(rl, game);
+
+    // Buy Phase
+    await performBuyPhase(currentPlayer, rl, game);
+
+    // Cleanup Phase
+    performCleanupPhase(currentPlayer);
 
     currentPlayerIndex = (currentPlayerIndex + 1) % game.players.length;
     if (currentPlayerIndex === 0) {
       endGame();
     } else {
-      nextTurn();
+      await nextTurn();
     }
   }
 
@@ -138,5 +101,4 @@ function startGame() {
   nextTurn();
 }
 
-// Call the startGame function to begin the game
 startGame();
