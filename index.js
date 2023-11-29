@@ -62,6 +62,9 @@ function startGame() {
     return;
   }
 
+  let turnCount = 0;
+  const maxTurns = game.players.length * 3
+
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -87,6 +90,11 @@ function startGame() {
 
     currentPlayerIndex = (currentPlayerIndex + 1) % game.players.length;
     if (currentPlayerIndex === 0) {
+      turnCount++; // Increment turn count after a full round
+    }
+
+    // Check for game-ending condition
+    if (turnCount >= maxTurns) {
       endGame();
     } else {
       await nextTurn();
