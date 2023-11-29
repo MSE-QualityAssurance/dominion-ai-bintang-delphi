@@ -4,18 +4,18 @@ const readline = require('readline');
 const DominionGame = {
   players: [],
   cards: [],
-initializeDecks() {
+  initializeDecks() {
     // Initialize decks for each player with basic cards
     this.players.forEach(player => {
-        for (let i = 0; i < 7; i++) {
-            player.deck.push(new Card("Copper", 0, "Treasure"));
-        }
-        for (let i = 0; i < 3; i++) {
-            player.deck.push(new Card("Estate", 2, "Victory"));
-        }
-        // Add more initial cards to the player's deck
+      for (let i = 0; i < 7; i++) {
+        player.deck.push(new Card("Copper", 0, "Treasure"));
+      }
+      for (let i = 0; i < 3; i++) {
+        player.deck.push(new Card("Estate", 2, "Victory"));
+      }
+      // Add more initial cards to the player's deck
     });
-},
+  },
   nextPlayer() {
     // Logic to determine the next player's turn
   },
@@ -59,34 +59,37 @@ const drawCardEffect = (player, game) => {
 const game = Object.create(DominionGame);
 
 // Add players to the game
-function addPlayersToGame() {
-    const readline = require('readline');
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
+async function addPlayersToGame() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
 
-    rl.question('How many players do you want to add? ', (numPlayers) => {
-        for (let i = 1; i <= numPlayers; i++) {
-            rl.question(`Enter the name of Player ${i}: `, (name) => {
-                game.players.push(new Player(name));
-                if (i === numPlayers) {
-                    rl.close();
-                    // Call the next function here
-                    addCardsToGame();
-                }
-            });
-        }
-    });
+  const questionAsync = (query) => new Promise(resolve => rl.question(query, resolve));
+
+  const numPlayers = await questionAsync('How many players do you want to add? ');
+  for (let i = 1; i <= numPlayers; i++) {
+    const name = await questionAsync(`Enter the name of Player ${i}: `);
+    game.players.push(new Player(name));
+  }
+
+  rl.close();
+
+  // Add cards and initialize decks
+  addCardsToGame();
+  game.initializeDecks();
+
+  // Start the game after all players have been added
+  startGame();
 }
 
 addPlayersToGame();
 
 // Add cards to the game
 function addCardsToGame() {
-    game.cards.push(new Card("Copper", 0, "Treasure"));
-    game.cards.push(new Card("Silver", 3, "Treasure"));
-    game.cards.push(new Card("Gold", 6, "Treasure"));
+  game.cards.push(new Card("Copper", 0, "Treasure"));
+  game.cards.push(new Card("Silver", 3, "Treasure"));
+  game.cards.push(new Card("Gold", 6, "Treasure"));
 }
 
 addCardsToGame();
@@ -98,6 +101,11 @@ game.initializeDecks();
 // Start the game
 function startGame() {
   // Create an interface for input and output
+  if (game.players.length === 0) {
+    console.log("No players have been added to the game.");
+    return;
+  }
+
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -108,13 +116,12 @@ function startGame() {
 
   function nextTurn() {
     const currentPlayer = game.players[currentPlayerIndex];
-    console.log(`${currentPlayer.name}'s turn`);
-  
+
     // Player performs action phase
     currentPlayer.performAction(game);
-  
+
     // Add additional phases (buy, cleanup, etc.)
-  
+
     currentPlayerIndex = (currentPlayerIndex + 1) % game.players.length;
     if (currentPlayerIndex === 0) {
       endGame();
