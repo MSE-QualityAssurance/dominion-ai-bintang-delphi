@@ -1,8 +1,19 @@
+const readline = require('readline');
 
 // Define the Dominion game object
 const DominionGame = {
   players: [],
   cards: [],
+  initializeDecks() {
+    // Initialize decks for each player with basic cards
+    this.players.forEach(player => {
+      player.deck.push(new Card("Copper", 0, "Treasure")); // Example of adding Copper cards
+      // Add more initial cards to the player's deck
+    });
+  },
+  nextPlayer() {
+    // Logic to determine the next player's turn
+  },
   // Add more properties and methods as needed
 };
 
@@ -40,9 +51,40 @@ game.cards.push(new Card("Silver", 3, "Treasure"));
 game.cards.push(new Card("Gold", 6, "Treasure"));
 // Add more cards as needed
 
+// Initialize player decks
+game.initializeDecks();
+
 // Start the game
 function startGame() {
-  // Add game logic here
+  // Create an interface for input and output
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  // Simple game loop
+  let currentPlayerIndex = 0;
+
+  function nextTurn() {
+    const currentPlayer = game.players[currentPlayerIndex];
+    console.log(`${currentPlayer.name}'s turn`);
+
+    // Add game turn logic here
+
+    currentPlayerIndex = (currentPlayerIndex + 1) % game.players.length;
+    if (currentPlayerIndex === 0) {
+      endGame();
+    } else {
+      nextTurn();
+    }
+  }
+
+  function endGame() {
+    console.log("Game Over");
+    rl.close();
+  }
+
+  nextTurn();
 }
 
 // Call the startGame function to begin the game
